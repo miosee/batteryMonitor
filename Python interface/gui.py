@@ -9,7 +9,7 @@ from tkinter import StringVar
 
 class Gui(tk.Tk):
     
-    def __init__(self):
+    def __init__(self, verrou):
         tk.Tk.__init__(self)
         self.wm_title("Battery Monitor")
         # frame contenant les infos et boutons
@@ -38,6 +38,7 @@ class Gui(tk.Tk):
         self.canvas.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=1)
         self.first = True
         self.ended = False
+        self.verrou = verrou
 
     def addData(self, t, v):
         if (self.first):
@@ -51,9 +52,10 @@ class Gui(tk.Tk):
         self.stateStr.set(newState)
 
     def changeVoltage(self, newValue):
-        self.stateStr.set("%fV" % newValue)
+        self.voltageStr.set("%fV" % newValue)
 
     def _quit(self):
+        self.verrou.acquire(True)
         self.quit()     # stops mainloop
         self.destroy()  # this is necessary on Windows to prevent
                         # Fatal Python Error: PyEval_RestoreThread: NULL tstate
@@ -71,7 +73,7 @@ class Gui(tk.Tk):
 ##time.sleep(1)
 ##btGui.addData(3,0)
 ##btGui.mainloop()
-
+##btGui.destroy()
 
 
 

@@ -1,22 +1,25 @@
 # -*- coding: ISO-8859-1 -*-
 from gui import Gui
 from batteryMonitor import BatMon
-import time, threading, pickle
+import time, pickle
+from threading import Thread, Lock
 
 
-class BatMonTh(threading.Thread):
+class BatMonTh(Thread):
     
-    def __init__(self, gui, com):
-        threading.Thread.__init__(self)
+    def __init__(self):
+        Thread.__init__(self)
         self.count = 0
         self.voltage = 0
         self.state = "idle"
-        self.batNb = 1
+        self.batNb = int(input("Entrez le numéro de la batterie :"))
         self.fileName = ""
-        self.t = self.count
-        self.com = com
-        self.connected = False
-        self.gui = gui
+        self.com = BatMon()
+        self.com.setPort('COM12')
+        self.verrou = Lock()
+        self.gui = Gui(self.verrou)
+        self.start()
+        self.gui.mainloop()
 
     def run(self):
         appRunning = True
@@ -28,23 +31,33 @@ class BatMonTh(threading.Thread):
                         self.count = 0
                         self.state = "connected"
                         self.file = self.createFile()
+                    else:
+                        time.sleep(0.5)
+                else:
+                    time.sleep(0.5)
             else:
                 data = self.com.getData()
                 self.voltage = data[0]
                 self.state = data[1]
                 self.count += 1
                 if ((self.state == "discharging") and (self.count%3==0)):
-                    self.gui.addData(self.count, self.voltage)
+                    if (self.verrou.acquire(False)):
+                        self.gui.addData(self.count, self.voltage)
+                        self.verrrou.release()
+                    else:
+                        appRunning = False
                     pickle.dump(self.count, self.file)
                     pickle.dump(self.voltage, self.file)
-                elif (self.state == "discharged"):
-                    if not(self.file.closed):
-                        self.file.close()
-            try:
+            if (self.verrou.acquire(False)):
                 self.gui.changeVoltage(self.voltage)
                 self.gui.changeState(self.state)
-            except:
+                self.verrou.release()
+            else:
                 appRunning = False
+        try:
+            self.file.close()
+        except:
+            self.fileName = ''
 
     def createFile(self):
         fileNb = 0
@@ -60,12 +73,6 @@ class BatMonTh(threading.Thread):
         return newFile    
             
 
-btCom = BatMon()
-btCom.setPort('COM12')
-
-btGui = Gui()
-appTh = BatMonTh(btGui, btCom)
-appTh.start()
-btGui.mainloop()
+appTh = BatMonTh()
 appTh.join()
 
