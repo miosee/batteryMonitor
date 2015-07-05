@@ -41,3 +41,12 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.o
+BatteryMonitor.X/build/default/debug/ADC.o.d
+*.d
+*.elf
+BatteryMonitor.X/dist/default/debug/BatteryMonitor.X.debug.map
+*.map
+BatteryMonitor.X/dist/default/production/BatteryMonitor.X.production.hex
+*.BDi
+*.pyc
