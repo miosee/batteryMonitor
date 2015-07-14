@@ -40,7 +40,14 @@ class BatMonTh(Thread):
                 self.voltage = data[0]
                 self.state = data[1]
                 self.count += 1
-                if ((self.state == "discharging") and (self.count%3==0)):
+                if (self.count > 32767):
+                    self.count = -32768
+                if (self.state == "idle"):
+                    try:
+                        self.file.close()
+                    except:
+                        self.fileName = ''
+                elif ((self.state == "discharging") and (self.count%60==0)):
                     if (self.verrou.acquire(False)):
                         self.gui.addData(self.count, self.voltage)
                         self.verrrou.release()

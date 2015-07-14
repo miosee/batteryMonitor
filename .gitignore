@@ -50,3 +50,8 @@ BatteryMonitor.X/dist/default/debug/BatteryMonitor.X.debug.map
 BatteryMonitor.X/dist/default/production/BatteryMonitor.X.production.hex
 *.BDi
 *.pyc
+BatteryMonitor.X/nbproject/Makefile-default.mk
+*.properties
+BatteryMonitor.X/nbproject/Makefile-impl.mk
+*.mk
+BatteryMonitor.X/nbproject/Package-default.bash
